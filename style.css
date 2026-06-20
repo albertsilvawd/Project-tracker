@@ -1,0 +1,43 @@
+:root {
+  --blue: #C0392B;
+  --green: #E74C3C;
+  --blue-hover: #96281B;
+  --blue-glow: rgba(192,57,43,0.15);
+  --accent: #C0392B;
+}
+
+.primary {
+  background: #C0392B !important;
+  color: white !important;
+  border-color: #C0392B !important;
+}
+
+.primary:hover {
+  background: #96281B !important;
+}
+
+.progress-bar-fill {
+  background: #C0392B !important;
+}
+
+.badge-red {
+  background: #FDEDEC;
+  color: #96281B;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: 500;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #C0392B !important;
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.15) !important;
+}
+
+input[type="checkbox"] {
+  accent-color: #C0392B;
+}
+
+.app-header {
+  border-bottom: 2px solid #C0392B;
+}
