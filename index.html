@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #ededeb;
+      --text: #1a1a18;
+      --text-secondary: #5f5e5a;
+      --border: rgba(0,0,0,0.12);
+      --border-md: rgba(0,0,0,0.25);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --blue: #378ADD;
+      --green: #1D9E75;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg-secondary: #2a2a28;
+        --bg-tertiary: #333331;
+        --text: #f0ede8;
+        --text-secondary: #a8a6a0;
+        --border: rgba(255,255,255,0.12);
+        --border-md: rgba(255,255,255,0.25);
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .app-header {
+      background: var(--bg);
+      border-bottom: 0.5px solid var(--border);
+      padding: 1rem 1.25rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-header h1 {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(55,138,221,0.15);
+    }
+
+    textarea { resize: vertical; }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button:hover { background: var(--bg-secondary); }
+    button:active { transform: scale(0.98); }
+
+    button.primary {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    button.primary:hover { background: #185FA5; }
+
+    button.danger {
+      color: #E24B4A;
+      border-color: rgba(226,75,74,0.4);
+    }
+
+    .card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .project-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.15s;
+    }
+
+    .project-card:hover { border-color: var(--border-md); background: var(--bg-secondary); }
+
+    .progress-bar-bg {
+      background: var(--bg-secondary);
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+      border: 0.5px solid var(--border);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 0.875rem;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-group { margin-bottom: 12px; }
+
+    .form-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 6px;
+    }
+
+    .task-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      cursor: pointer;
+      accent-color: var(--green);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      opacity: 0.45;
+    }
+
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .flex-1 { flex: 1; min-width: 0; }
+
+    .back-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .divider {
+      border: none;
+      border-top: 0.5px solid var(--border);
+      margin: 1.25rem 0;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      padding: 3rem 0;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    .badge-blue { background: #E6F1FB; color: #185FA5; }
+    .badge-green { background: #E1F5EE; color: #0F6E56; }
+
+    .session-log {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .hidden { display: none !important; }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1><i class="ti ti-chart-bar" aria-hidden="true"></i> Study Tracker</h1>
+</div>
+
+<div class="container">
+
+  <!-- LIST VIEW -->
+  <div id="view-list">
+    <div class="top-row" style="margin-top: 0.5rem;">
+      <span style="font-size:15px; font-weight:500; color:var(--text);">Meus projetos</span>
+      <button onclick="showView('add-project')">
+        <i class="ti ti-plus" aria-hidden="true"></i> Novo projeto
+      </button>
+    </div>
+    <div id="projects-container"></div>
+    <div id="empty-msg" class="empty hidden">
+      <i class="ti ti-folder" style="font-size:40px; opacity:0.3;" aria-hidden="true"></i>
+      <p style="margin-top:12px;">Nenhum projeto ainda.<br>Crie o primeiro!</p>
+    </div>
+  </div>
+
+  <!-- ADD PROJECT VIEW -->
+  <div id="view-add-project" class="hidden">
+    <div class="back-row">
+      <button onclick="showView('list')"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+      <span class="page-title">Novo projeto</span>
+    </div>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Nome do projeto</label>
+        <input type="text" id="proj-name" placeholder="Ex: PMP Certification">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Modo de rastreamento</label>
+        <select id="proj-mode" onchange="toggleModeFields()">
+          <option value="hours">Por horas</option>
+          <option value="tasks">Por tarefas</option>
+        </select>
+      </div>
+      <div id="hours-fields">
+        <div class="form-group">
+          <label class="form-label">Total de horas do projeto</label>
+          <input type="number" id="proj-total-hours" placeholder="Ex: 120" min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Horas de estudo por dia</label>
+          <input type="number" id="proj-daily-hours" placeholder="Ex: 2" min="0.5" step="0.5">
+        </div>
+      </div>
+      <div id="tasks-fields" class="hidden">
+        <div class="form-group">
+          <label class="form-label">Tarefas (uma por linha)</label>
+          <textarea id="proj-tasks" rows="5" placeholder="Estudar módulo 1&#10;Fazer quiz&#10;Revisar anotações"></textarea>
+        </div>
+      </div>
+      <button class="primary" onclick="createProject()" style="width:100%; justify-content:center; margin-top:4px;">
+        <i class="ti ti-check" aria-hidden="true"></i> Criar projeto
+      </button>
+    </div>
+  </div>
+
+  <!-- PROJECT VIEW -->
+  <div id="view-project" class="hidden">
+    <div class="back-row">
+      <button onclick="showView('list')"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+      <span class="page-title" id="proj-view-name"></span>
+    </div>
+
+    <div class="stat-grid" id="stat-cards"></div>
+
+    <div class="card" style="margin-bottom:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:13px; color:var(--text-secondary);">Progresso geral</span>
+        <span id="pct-label" style="font-size:13px; font-weight:500; color:var(--text);"></span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- HOURS SECTION -->
+    <div id="hours-section" class="card hidden" style="margin-bottom:1rem;">
+      <p class="section-title">Registrar sessão</p>
+      <div class="row">
+        <input type="number" id="log-hours" min="0.5" step="0.5" placeholder="Horas estudadas" style="flex:1;">
+        <button class="primary" onclick="logHours()">
+          <i class="ti ti-check" aria-hidden="true"></i> Registrar
+        </button>
+      </div>
+      <div class="session-log" id="session-log"></div>
+    </div>
+
+    <!-- TASKS SECTION -->
+    <div id="tasks-section" class="hidden" style="margin-bottom:1rem;">
+      <p class="section-title">Tarefas</p>
+      <div id="tasks-list"></div>
+      <div class="row" style="margin-top:10px;">
+        <input type="text" id="new-task-input" placeholder="Nova tarefa..." style="flex:1;">
+        <button onclick="addTask()">
+          <i class="ti ti-plus" aria-hidden="true"></i> Adicionar
+        </button>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <button class="danger" onclick="deleteProject()">
+      <i class="ti ti-trash" aria-hidden="true"></i> Excluir projeto
+    </button>
+  </div>
+
+</div>
+
+<script>
+  let projects = [];
+  let currentId = null;
+
+  function save() {
+    try { localStorage.setItem('study_tracker_v1', JSON.stringify(projects)); } catch(e) {}
+  }
+
+  function load() {
+    try {
+      const d = localStorage.getItem('study_tracker_v1');
+      if (d) projects = JSON.parse(d);
+    } catch(e) {}
+    renderList();
+  }
+
+  function showView(v) {
+    ['list','add-project','project'].forEach(x => {
+      document.getElementById('view-'+x).classList.toggle('hidden', v !== x);
+    });
+    if (v === 'list') renderList();
+    if (v === 'project') renderProject();
+    window.scrollTo(0, 0);
+  }
+
+  function toggleModeFields() {
+    const m = document.getElementById('proj-mode').value;
+    document.getElementById('hours-fields').classList.toggle('hidden', m !== 'hours');
+    document.getElementById('tasks-fields').classList.toggle('hidden', m !== 'tasks');
+  }
+
+  function createProject() {
+    const name = document.getElementById('proj-name').value.trim();
+    const mode = document.getElementById('proj-mode').value;
+    if (!name) return alert('Dê um nome ao projeto.');
+    const proj = { id: Date.now(), name, mode, createdAt: new Date().toISOString() };
+    if (mode === 'hours') {
+      const total = parseFloat(document.getElementById('proj-total-hours').value);
+      const daily = parseFloat(document.getElementById('proj-daily-hours').value);
+      if (!total || !daily) return alert('Preencha o total de horas e as horas diárias.');
+      proj.totalHours = total;
+      proj.dailyHours = daily;
+      proj.loggedHours = 0;
+      proj.sessions = [];
+    } else {
+      const raw = document.getElementById('proj-tasks').value.trim();
+      if (!raw) return alert('Adicione ao menos uma tarefa.');
+      proj.tasks = raw.split('\n').filter(t => t.trim()).map((t, i) => ({ id: i, text: t.trim(), done: false }));
+    }
+    projects.push(proj);
+    save();
+    document.getElementById('proj-name').value = '';
+    document.getElementById('proj-total-hours').value = '';
+    document.getElementById('proj-daily-hours').value = '';
+    document.getElementById('proj-tasks').value = '';
+    showView('list');
+  }
+
+  function openProject(id) {
+    currentId = id;
+    showView('project');
+  }
+
+  function getProj() { return projects.find(p => p.id === currentId); }
+
+  function getPct(p) {
+    if (p.mode === 'hours') return Math.min(100, Math.round((p.loggedHours / p.totalHours) * 100));
+    const done = p.tasks.filter(t => t.done).length;
+    return p.tasks.length ? Math.round((done / p.tasks.length) * 100) : 0;
+  }
+
+  function renderList() {
+    const c = document.getElementById('projects-container');
+    const em = document.getElementById('empty-msg');
+    c.innerHTML = '';
+    if (!projects.length) { em.classList.remove('hidden'); return; }
+    em.classList.add('hidden');
+    projects.forEach(p => {
+      const pct = getPct(p);
+      const color = pct === 100 ? '#1D9E75' : '#378ADD';
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <span style="font-size:15px; font-weight:500; color:var(--text);">${p.name}</span>
+          <span class="badge ${pct===100?'badge-green':'badge-blue'}">${pct}%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${pct}%; background:${color};"></div>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:var(--text-secondary);">
+          ${p.mode==='hours'
+            ? `${p.loggedHours.toFixed(1)}h de ${p.totalHours}h registradas`
+            : `${p.tasks.filter(t=>t.done).length} de ${p.tasks.length} tarefas concluídas`}
+        </div>
+      `;
+      card.onclick = () => openProject(p.id);
+      c.appendChild(card);
+    });
+  }
+
+  function renderProject() {
+    const p = getProj();
+    if (!p) return;
+    document.getElementById('proj-view-name').textContent = p.name;
+    const pct = getPct(p);
+    document.getElementById('pct-label').textContent = pct + '%';
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = pct + '%';
+    bar.style.background = pct === 100 ? '#1D9E75' : '#378ADD';
+
+    const sc = document.getElementById('stat-cards');
+    if (p.mode === 'hours') {
+      const rem = Math.max(0, p.totalHours - p.loggedHours);
+      const days = p.dailyHours > 0 ? Math.ceil(rem / p.dailyHours) : '—';
+      sc.innerHTML = `
+        ${stat('Registradas', p.loggedHours.toFixed(1) + 'h')}
+        ${stat('Total', p.totalHours + 'h')}
+        ${stat('Restantes', rem.toFixed(1) + 'h')}
+        ${stat('Dias est.', days)}
+      `;
+      document.getElementById('hours-section').classList.remove('hidden');
+      document.getElementById('tasks-section').classList.add('hidden');
+      const sessions = p.sessions || [];
+      const log = document.getElementById('session-log');
+      log.innerHTML = sessions.length
+        ? sessions.slice().reverse().map(s => `<div>${new Date(s.date).toLocaleDateString('pt-BR')} — ${s.hours}h</div>`).join('')
+        : '<div style="opacity:0.5;">Nenhuma sessão registrada ainda.</div>';
+    } else {
+      const done = p.tasks.filter(t => t.done).length;
+      sc.innerHTML = `
+        ${stat('Concluídas', done)}
+        ${stat('Total', p.tasks.length)}
+        ${stat('Pendentes', p.tasks.length - done)}
+        ${stat('Progresso', pct + '%')}
+      `;
+      document.getElementById('hours-section').classList.add('hidden');
+      document.getElementById('tasks-section').classList.remove('hidden');
+      renderTasks(p);
+    }
+  }
+
+  function stat(label, value) {
+    return `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-value">${value}</div></div>`;
+  }
+
+  function renderTasks(p) {
+    const tl = document.getElementById('tasks-list');
+    tl.innerHTML = '';
+    p.tasks.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${t.id})" aria-label="Marcar tarefa como concluída">
+        <span class="task-text ${t.done ? 'done' : ''}">${t.text}</span>
+        <button onclick="removeTask(${t.id})" style="padding:2px 8px;" aria-label="Remover tarefa">
+          <i class="ti ti-x" aria-hidden="true"></i>
+        </button>
+      `;
+      tl.appendChild(row);
+    });
+  }
+
+  function toggleTask(tid) {
+    const p = getProj();
+    const t = p.tasks.find(x => x.id === tid);
+    if (t) t.done = !t.done;
+    save();
+    renderProject();
+  }
+
+  function removeTask(tid) {
+    const p = getProj();
+    p.tasks = p.tasks.filter(x => x.id !== tid);
+    save();
+    renderProject();
+  }
+
+  function addTask() {
+    const inp = document.getElementById('new-task-input');
+    const text = inp.value.trim();
+    if (!text) return;
+    const p = getProj();
+    const newId = p.tasks.length ? Math.max(...p.tasks.map(t => t.id)) + 1 : 0;
+    p.tasks.push({ id: newId, text, done: false });
+    inp.value = '';
+    save();
+    renderProject();
+  }
+
+  function logHours() {
+    const val = parseFloat(document.getElementById('log-hours').value);
+    if (!val || val <= 0) return alert('Insira um número válido de horas.');
+    const p = getProj();
+    p.loggedHours = Math.min(p.totalHours, +(p.loggedHours + val).toFixed(2));
+    if (!p.sessions) p.sessions = [];
+    p.sessions.push({ date: new Date().toISOString(), hours: val });
+    document.getElementById('log-hours').value = '';
+    save();
+    renderProject();
+  }
+
+  function deleteProject() {
+    if (!confirm('Tem certeza que quer excluir este projeto?')) return;
+    projects = projects.filter(p => p.id !== currentId);
+    currentId = null;
+    save();
+    showView('list');
+  }
+
+  load();
+</script>
+</body>
+</html>
