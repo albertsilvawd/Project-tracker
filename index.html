@@ -431,16 +431,88 @@
 <script>
   let projects = [];
   let currentId = null;
+  let binId = null;
 
-  function save() {
-    try { localStorage.setItem('study_tracker_v1', JSON.stringify(projects)); } catch(e) {}
+  const API_KEY = '$2a$10$EUtT3olkGuFGZ1BZsQQ9nOChM9VK8Odg21lNcXWtAga0kKgtQB4Ra';
+  const BIN_ID_KEY = 'project_tracker_bin_id';
+  const HEADERS = {
+    'Content-Type': 'application/json',
+    'X-Master-Key': API_KEY,
+    'X-Bin-Versioning': 'false'
+  };
+
+  function showSaving(msg) {
+    let el = document.getElementById('sync-status');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'sync-status';
+      el.style.cssText = 'position:fixed;bottom:16px;right:16px;background:#C0392B;color:white;padding:8px 16px;border-radius:8px;font-size:13px;z-index:999;transition:opacity 0.3s;';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.opacity = '1';
+    if (msg === 'Sincronizado!') {
+      setTimeout(() => { el.style.opacity = '0'; }, 2000);
+    }
   }
 
-  function load() {
+  async function save() {
     try {
-      const d = localStorage.getItem('study_tracker_v1');
-      if (d) projects = JSON.parse(d);
+      localStorage.setItem('study_tracker_v1', JSON.stringify(projects));
     } catch(e) {}
+    showSaving('Salvando...');
+    try {
+      if (!binId) {
+        binId = localStorage.getItem(BIN_ID_KEY);
+      }
+      if (binId) {
+        await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+          method: 'PUT',
+          headers: HEADERS,
+          body: JSON.stringify({ projects })
+        });
+      } else {
+        const res = await fetch('https://api.jsonbin.io/v3/b', {
+          method: 'POST',
+          headers: { ...HEADERS, 'X-Bin-Name': 'project-tracker' },
+          body: JSON.stringify({ projects })
+        });
+        const data = await res.json();
+        binId = data.metadata.id;
+        localStorage.setItem(BIN_ID_KEY, binId);
+      }
+      showSaving('Sincronizado!');
+    } catch(e) {
+      showSaving('Erro ao sincronizar');
+      setTimeout(() => { document.getElementById('sync-status').style.opacity = '0'; }, 3000);
+    }
+  }
+
+  async function load() {
+    showSaving('Carregando...');
+    try {
+      binId = localStorage.getItem(BIN_ID_KEY);
+      if (binId) {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          headers: { 'X-Master-Key': API_KEY }
+        });
+        const data = await res.json();
+        if (data.record && data.record.projects) {
+          projects = data.record.projects;
+          localStorage.setItem('study_tracker_v1', JSON.stringify(projects));
+        }
+        showSaving('Sincronizado!');
+      } else {
+        const local = localStorage.getItem('study_tracker_v1');
+        if (local) projects = JSON.parse(local);
+        showSaving('Sincronizado!');
+      }
+    } catch(e) {
+      const local = localStorage.getItem('study_tracker_v1');
+      if (local) projects = JSON.parse(local);
+      showSaving('Modo offline');
+      setTimeout(() => { document.getElementById('sync-status').style.opacity = '0'; }, 3000);
+    }
     renderList();
   }
 
