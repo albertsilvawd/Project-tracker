@@ -279,6 +279,35 @@
       margin-bottom: 1.25rem;
     }
   </style>
+
+  <style>
+    :root {
+      --blue: #C0392B !important;
+      --green: #E74C3C !important;
+    }
+    .app-header {
+      background: #C0392B !important;
+      border-bottom: none !important;
+    }
+    .app-header h1 {
+      color: #ffffff !important;
+    }
+    .top-row button {
+      background: #C0392B !important;
+      color: #ffffff !important;
+      border-color: #C0392B !important;
+      font-weight: 500;
+    }
+    .top-row button:hover { background: #96281B !important; }
+    .primary { background: #C0392B !important; border-color: #C0392B !important; color: #fff !important; }
+    .primary:hover { background: #96281B !important; }
+    .progress-bar-fill { background: #C0392B !important; }
+    .badge-red { background: #FDEDEC; color: #96281B; }
+    input:focus, select:focus, textarea:focus { border-color: #C0392B !important; box-shadow: 0 0 0 3px rgba(192,57,43,0.15) !important; }
+    input[type="checkbox"] { accent-color: #C0392B; }
+    .empty { color: #C0392B !important; opacity: 0.5; }
+    .project-card:hover { border-color: #C0392B !important; }
+  </style>
 </head>
 <body>
 
@@ -473,7 +502,7 @@
     em.classList.add('hidden');
     projects.forEach(p => {
       const pct = getPct(p);
-      const color = pct === 100 ? '#E74C3C' : '#C0392B';
+      const color = '#C0392B';
       const card = document.createElement('div');
       card.className = 'project-card';
       card.innerHTML = `
@@ -503,7 +532,7 @@
     document.getElementById('pct-label').textContent = pct + '%';
     const bar = document.getElementById('progress-bar');
     bar.style.width = pct + '%';
-    bar.style.background = pct === 100 ? '#E74C3C' : '#C0392B';
+    bar.style.background = '#C0392B';
 
     const sc = document.getElementById('stat-cards');
     if (p.mode === 'hours') {
