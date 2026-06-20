@@ -435,6 +435,7 @@
 
   const API_KEY = '$2a$10$EUtT3olkGuFGZ1BZsQQ9nOChM9VK8Odg21lNcXWtAga0kKgtQB4Ra';
   const BIN_ID_KEY = 'project_tracker_bin_id';
+  const FIXED_BIN_ID = '6a36ff96da38895dfee4501c';
   const HEADERS = {
     'Content-Type': 'application/json',
     'X-Master-Key': API_KEY,
@@ -462,25 +463,12 @@
     } catch(e) {}
     showSaving('Salvando...');
     try {
-      if (!binId) {
-        binId = localStorage.getItem(BIN_ID_KEY);
-      }
-      if (binId) {
-        await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-          method: 'PUT',
-          headers: HEADERS,
-          body: JSON.stringify({ projects })
-        });
-      } else {
-        const res = await fetch('https://api.jsonbin.io/v3/b', {
-          method: 'POST',
-          headers: { ...HEADERS, 'X-Bin-Name': 'project-tracker' },
-          body: JSON.stringify({ projects })
-        });
-        const data = await res.json();
-        binId = data.metadata.id;
-        localStorage.setItem(BIN_ID_KEY, binId);
-      }
+      binId = FIXED_BIN_ID;
+      await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: 'PUT',
+        headers: HEADERS,
+        body: JSON.stringify({ projects })
+      });
       showSaving('Sincronizado!');
     } catch(e) {
       showSaving('Erro ao sincronizar');
@@ -491,7 +479,8 @@
   async function load() {
     showSaving('Carregando...');
     try {
-      binId = localStorage.getItem(BIN_ID_KEY);
+      binId = FIXED_BIN_ID;
+      localStorage.setItem(BIN_ID_KEY, binId);
       if (binId) {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
           headers: { 'X-Master-Key': API_KEY }
