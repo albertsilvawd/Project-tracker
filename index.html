@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Tracker</title>
+  <title>Project Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,8 +18,8 @@
       --border-md: rgba(0,0,0,0.25);
       --radius-md: 8px;
       --radius-lg: 12px;
-      --blue: #378ADD;
-      --green: #1D9E75;
+      --blue: #C0392B;
+      --green: #E74C3C;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -81,7 +81,7 @@
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(55,138,221,0.15);
+      box-shadow: 0 0 0 3px rgba(192,57,43,0.15);
     }
 
     textarea { resize: vertical; }
@@ -110,7 +110,7 @@
       border-color: var(--blue);
     }
 
-    button.primary:hover { background: #185FA5; }
+    button.primary:hover { background: #96281B; }
 
     button.danger {
       color: #E24B4A;
@@ -208,7 +208,7 @@
       height: 16px;
       min-width: 16px;
       cursor: pointer;
-      accent-color: var(--green);
+      accent-color: #C0392B;
     }
 
     .task-text {
@@ -258,8 +258,8 @@
       font-weight: 500;
     }
 
-    .badge-blue { background: #E6F1FB; color: #185FA5; }
-    .badge-green { background: #E1F5EE; color: #0F6E56; }
+    .badge-blue { background: #E6F1FB; color: #96281B; }
+    .badge-green { background: #FDEDEC; color: #96281B; }
 
     .session-log {
       font-size: 12px;
@@ -282,7 +282,7 @@
 <body>
 
 <div class="app-header">
-  <h1><i class="ti ti-chart-bar" aria-hidden="true"></i> Study Tracker</h1>
+  <h1><i class="ti ti-chart-bar" aria-hidden="true"></i> Project Tracker</h1>
 </div>
 
 <div class="container">
@@ -472,13 +472,13 @@
     em.classList.add('hidden');
     projects.forEach(p => {
       const pct = getPct(p);
-      const color = pct === 100 ? '#1D9E75' : '#378ADD';
+      const color = pct === 100 ? '#E74C3C' : '#C0392B';
       const card = document.createElement('div');
       card.className = 'project-card';
       card.innerHTML = `
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
           <span style="font-size:15px; font-weight:500; color:var(--text);">${p.name}</span>
-          <span class="badge ${pct===100?'badge-green':'badge-blue'}">${pct}%</span>
+          <span class="badge ${pct===100?'badge-red':'badge-red'}">${pct}%</span>
         </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" style="width:${pct}%; background:${color};"></div>
@@ -502,7 +502,7 @@
     document.getElementById('pct-label').textContent = pct + '%';
     const bar = document.getElementById('progress-bar');
     bar.style.width = pct + '%';
-    bar.style.background = pct === 100 ? '#1D9E75' : '#378ADD';
+    bar.style.background = pct === 100 ? '#E74C3C' : '#C0392B';
 
     const sc = document.getElementById('stat-cards');
     if (p.mode === 'hours') {
